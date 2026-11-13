@@ -2,15 +2,17 @@
 
 用对话轻松建码、管理表单、分析巡检记录，让日常工作更简单。
 
+**草料二维码官网：[cli.im](https://cli.im/)**
+
 ## 安装插件
 
 ### 下载安装包（推荐）
 
-打开 [最新 Release](https://github.com/caoliao/dsh-caoliao-qrcode/releases/latest)，下载 `dsh-caoliao-qrcode.tgz`。
+点击 [最新安装包下载链接](https://github.com/caoliao/dsh-caoliao-qrcode/releases/latest/download/dsh-caoliao-qrcode.tgz)，下载插件安装包。
 打开 Harness 的 **插件 → 添加插件**，选择下载的文件，安装并启用后重启。
 随后打开 **草料二维码**，点击 **连接草料账号** 完成授权。
 
-也可以使用 [最新安装包下载链接](https://github.com/caoliao/dsh-caoliao-qrcode/releases/latest/download/dsh-caoliao-qrcode.tgz)。无需安装 Git、Python 或 Node.js。
+无需安装 Git、Python 或 Node.js。
 
 ### 从源码构建
 
@@ -70,7 +72,7 @@ python -c "from pathlib import Path; print(Path('dist/dsh-caoliao-qrcode').resol
 
 ## 更新插件
 
-从 Releases 下载最新安装包，在 Harness 中移除旧插件，再选择新的安装包安装并重启。
+通过上方下载链接获取最新安装包，在 Harness 中移除旧插件，再选择新的安装包安装并重启。
 如果使用源码构建，先运行 `git pull`，再执行 `python scripts/build.py` 重新生成安装包。
 
 ## 开发与贡献
