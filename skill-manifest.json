@@ -1,0 +1,26 @@
+{
+  "name": "caoliao-admin",
+  "description": "搜索或按系统分类选择官方模板并准备、执行批量建码；通过草料 MCP 查询二维码、表单记录及后续动态、扫描量与组织指标；创建静态码、跳转码、图片/文件码、图文展示码、基础信息模板和批量子码，上传图片附件，创建填写表单及周期；查询周期计划、完成与未完成的具体码，确认当前组织和可用能力。支持现有标签样式的预览与单张 A4 PDF 导出。适用于产品展示、通讯录、设备台账、巡检及草料数据分析；按用户场景读取对应说明。",
+  "version": "2026.11.1",
+  "source_skill_version": "1.16.4",
+  "source_files_sha256": {
+    "SKILL.md": "a7693641ef57b5635023f47765270fbbb2a46bc88e754f3f4d644d7a69e5f1d2",
+    "references/query-and-analysis.md": "8ff7d960f0de9803a7494e7ee6720a9151c573272e5f761219613455fcc5af47",
+    "references/create-qrcodes.md": "44987b7a57be00ff16b9525afbcd504a3cf9346b4eec1fdd2650ce9556eeafc7",
+    "references/files.md": "6b944727fd8e09628b188e5fcc3f5f19513d4f0f6206eb98179739185e8fe24d",
+    "references/forms-and-cycles.md": "da44e0ab31a7d122c13a7fb3f6a4614fdb1ba6ce99ceb576b0dc254eed3dcf26",
+    "references/quiz.md": "c6b7826144eb5f5706d0b6b2b563f8f8253178628b138597b1be436dfa0b5333",
+    "references/labels.md": "6e7ebe68ef83bda8eeaf58f8afae9b3148af6aad206f98da586c9b55f7b8bb08",
+    "references/errors.md": "66c7a3cc93ee4441cde98be3a2abec4d7ab215260e3ef133d0b735b62e8a9389",
+    "references/local-preparation.md": "c09c27c187df2094b91733eefef85aa9e877d5e9904b9d2198a046e5d17fbc08",
+    "references/tool-arguments.md": "53a5bbcc4de67f0e251f4210d808a9e4cf45cd231496deadb0704234aaab9a49",
+    "examples/employee-directory.md": "738a85ef2e52c67ce557d61b46461a0a9cba4c60a037ecf16c39c22bba1ec046",
+    "examples/equipment-inspection.md": "46ef1726aa53bbda3e711a69f58625a73ad8cec9c55a18968a27c057d4427535",
+    "scripts/upload_file.py": "bd16bfe40b846535f79e9815e6536acdcb0613944a00fba765371c000a0891bf",
+    "scripts/prepare_batch.py": "e691d7b97bbc60ae8775866afaa2be6b493b6004e76b9e1d0d297cbb06103a91",
+    "scripts/transfer.cjs": "4e14de06e191a5a59f89c0e19eceabadbd5374586854a144240669791de6acd3",
+    "scripts/upload_file.cjs": "5a107dc4d159509dc9887ada603d13d979c957107294aa92c4280ec8dd5842ef",
+    "scripts/download_qrcodes.cjs": "c16daca0979554ab322871c0fdf8a2a6900da4d517e917d476f276b551b4cc63"
+  },
+  "adapter_sha256": "a1e56a0fb6446cf9f43944556218ae04d0855b05613e8ca4ac2ee4ef417c6f2c"
+}

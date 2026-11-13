@@ -1,0 +1,64 @@
+name: Build plugin
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Verify tag belongs to main
+        shell: bash
+        run: |
+          git fetch origin main:refs/remotes/origin/main
+          git merge-base --is-ancestor HEAD refs/remotes/origin/main || {
+            echo "::error::The tagged commit must belong to main."
+            exit 1
+          }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify tag matches package version
+        shell: bash
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::Tag must match v followed by the package version."
+            exit 1
+          fi
+      - run: npm ci --ignore-scripts --legacy-peer-deps
+      - run: npm test
+      - name: Prepare release assets
+        run: python scripts/release-assets.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: caoliao-plugin-and-registry
+          path: dist/release/*
+          if-no-files-found: error
+          retention-days: 30
+  draft:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v4
+        with:
+          name: caoliao-plugin-and-registry
+          path: dist/release
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/release/* --draft --verify-tag --title "草料二维码 $GITHUB_REF_NAME" --notes-file .github/release-notes.md

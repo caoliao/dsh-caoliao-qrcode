@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-11-13",
+  "harness": {
+    "repository": "https://github.com/deepseek-ai/deepseek-harness",
+    "commit": "e8f7b93a344964de3dca1ace9e72b6e4d6de87cb",
+    "runtime_version": "0.2.2-rc.2"
+  },
+  "registry": {
+    "repository": "https://github.com/duhu2000/dsh-mcp-connector-registry",
+    "commit": "2f87eb6a954c0d404651b35814c6590e8a71dfb8",
+    "schema": "schema/connector.schema.json"
+  }
+}

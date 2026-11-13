@@ -1,0 +1,2 @@
+# Preserve exact snapshot bytes; CRLF is valid source text.
+* -text whitespace=cr-at-eol
