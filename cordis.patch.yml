@@ -1,0 +1,4 @@
+- insert:
+    - id: caoliao-qrcode-companion
+      name: dsh-caoliao-qrcode
+      config: {}

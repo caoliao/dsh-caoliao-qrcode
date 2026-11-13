@@ -6,13 +6,26 @@
 
 ## 安装插件
 
-### 下载安装包（推荐）
+### 使用 GitHub 链接安装（推荐）
 
-点击 [最新安装包下载链接](https://github.com/caoliao/dsh-caoliao-qrcode/releases/latest/download/dsh-caoliao-qrcode.tgz)，下载插件安装包。
-打开 Harness 的 **插件 → 添加插件**，选择下载的文件，安装并启用后重启。
-随后打开 **草料二维码**，点击 **连接草料账号** 完成授权。
+打开 Harness 的 **插件 → 添加插件**，粘贴以下地址，安装并启用后重启：
 
-无需安装 Git、Python 或 Node.js。
+```text
+https://github.com/caoliao/dsh-caoliao-qrcode
+```
+
+插件已包含运行文件和配套 Skill，无需手动构建。随后打开 **草料二维码**，点击 **连接草料账号** 完成授权。
+
+### 使用安装包链接
+
+复制 [最新安装包下载链接](https://github.com/caoliao/dsh-caoliao-qrcode/releases/latest/download/dsh-caoliao-qrcode.tgz)，直接粘贴到 Harness 的 **插件 → 添加插件** 输入框中即可安装，无需先下载到本地：
+
+```text
+https://github.com/caoliao/dsh-caoliao-qrcode/releases/latest/download/dsh-caoliao-qrcode.tgz
+```
+
+安装并启用后重启，打开 **草料二维码**，点击 **连接草料账号** 完成授权。
+也可以下载 `.tgz` 文件后从本地安装。以上方式均无需手动构建。
 
 ### 从源码构建
 
@@ -28,7 +41,7 @@ python scripts/build.py
 ```
 
 构建完成后，`dist/dsh-caoliao-qrcode` 是完整的可安装插件目录，包含账号连接功能和配套 Skill。
-请使用这个目录，不要选择仓库根目录或 `plugin` 源码目录。
+仓库根目录也可直接安装；`plugin` 是开发源文件目录，请勿单独安装。
 
 #### 2. 添加到 Harness
 
@@ -72,7 +85,7 @@ python -c "from pathlib import Path; print(Path('dist/dsh-caoliao-qrcode').resol
 
 ## 更新插件
 
-通过上方下载链接获取最新安装包，在 Harness 中移除旧插件，再选择新的安装包安装并重启。
+在 Harness 中移除旧插件，再使用上述 GitHub 链接或最新安装包重新安装并重启。
 如果使用源码构建，先运行 `git pull`，再执行 `python scripts/build.py` 重新生成安装包。
 
 ## 开发与贡献

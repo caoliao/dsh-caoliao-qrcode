@@ -15,6 +15,20 @@ const { default: SkillRegistry, renderSkillContent } = await import(pathToFileUR
 const plugin = await import(pathToFileURL(join(bundle, 'index.js')))
 const { CaoliaoOAuth, GRANT_KEY, TOKEN_REF, SERVER, ISSUER, rpcHandler, registerOAuthRoute } = await import(pathToFileURL(join(bundle, 'oauth.js')))
 
+test('installable package declares its bundle and includes compiled client and Skill', async () => {
+  const pkg = JSON.parse(await readFile(join(bundle, 'package.json'), 'utf8'))
+  assert.equal(pkg.name, 'dsh-caoliao-qrcode')
+  assert.equal(pkg.dsh.bundle.patch, './cordis.patch.yml')
+  assert.match(await readFile(join(bundle, pkg.dsh.bundle.patch), 'utf8'), /name: dsh-caoliao-qrcode/)
+  for (const entry of [pkg.main, pkg.exports['./client'], pkg.icon, 'skills/caoliao-admin/SKILL.md']) {
+    assert.ok((await readFile(join(bundle, entry))).length)
+  }
+  const client = await readFile(join(bundle, 'client.js'), 'utf8')
+  assert.doesNotMatch(client, /__CAOLIAO_(LOGO|STYLES)__/)
+  assert.match(client, /data:image\/png;base64,/)
+  for (const hook of ['prepare', 'preinstall', 'install', 'postinstall']) assert.equal(pkg.scripts?.[hook], undefined)
+})
+
 function memory() {
   const records = new Map(), refs = new Map()
   let tail = Promise.resolve()

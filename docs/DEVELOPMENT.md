@@ -43,3 +43,20 @@ Registry 接入流程见 [提交说明](../registry/SUBMISSION.md)。
 固定下载地址为 https://github.com/caoliao/dsh-caoliao-qrcode/releases/latest/download/dsh-caoliao-qrcode.tgz 。只有正式 Release 发布后此地址才会生效，草稿和 Actions artifact 不提供匿名安装链接。
 
 Registry ZIP 与插件来自同一次构建。Registry 收录仍需单独提交上游 PR 和完成审核；发布插件不会自动上架 Registry。
+
+## Git 仓库直接安装
+
+根目录 package.json 声明真实插件身份和 dsh.bundle，运行文件随 Git 提交。plugin/ 保留开发源文件；根目录 client.js 是已嵌入样式与 Logo 的产物。没有 prepare/install 构建钩子，安装端不依赖 Python 或开发工具。
+
+修改 plugin/ 后运行 `npm run build`，提交根目录的同步产物。`npm test` 检查根目录与构建产物、包元数据一致，避免直接 Git 安装拿到旧代码。修改插件包元数据时同步修改根目录 package.json，并更新锁文件。
+
+## npm 发布准备
+
+`npm run npm:prepare` 将完整插件生成到 dist/npm，移除该发布副本的 private 和脚本；根目录与 plugin/package.json 继续禁止直接 npm 发布。
+运行 `npm pack ./dist/npm --dry-run` 检查文件列表，不上传任何内容。
+
+npm.yml 在正式 Release 发布时执行预检，也可以手动执行预检。真正发布还需要仓库变量 NPM_PUBLISH_ENABLED 严格等于 true，以及 npm-publish 环境授权；当前未开启。手动运行工作流永远只预检。
+
+首次发布前须确认 npm 包名 dsh-caoliao-qrcode 的所有权（GitHub 组织权限不等于 npm 权限），完成首次包注册与 npm Trusted Publisher 配置，关联 caoliao/dsh-caoliao-qrcode、npm.yml 与 npm-publish 环境。建议为该环境设置必需审核人。首次注册需要单独授权和 npm 登录，不由当前流程执行。
+
+后续发布使用 GitHub OIDC，不保存长期 npm token。版本必须匹配 Release tag，已发布的 npm 版本不可覆盖。旧 tag 不包含新脚本，需在含本次改动的新版本 Release 上使用此流程；不要移动已公开的旧 tag。
