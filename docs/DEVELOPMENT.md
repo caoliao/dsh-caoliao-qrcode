@@ -13,7 +13,7 @@
 执行 `python scripts/build.py` 生成 dist/ 下的完整插件目录、tgz、Registry 材料 ZIP 和哈希清单。
 执行 `npm ci --ignore-scripts --legacy-peer-deps` 安装测试依赖，再执行 `npm test`。
 测试会监听本机回环端口；授权服务器和 MCP manager 使用模拟实现，不调用真实业务数据。
-宿主兼容范围及依赖约束以 plugin/package.json 为准。
+不设置 engines.dsh 版本门槛，DSH 宿主包的 peerDependencies 使用 `*`，由宿主提供运行依赖；开发测试依赖仍固定版本以保持可复现。此策略不表示所有宿主版本均已通过验收，兼容性取决于所需的 Skill、MCP manager、credentials、connection、webServer 和客户端布局接口。Node.js 运行要求及其他依赖约束以 plugin/package.json 为准。
 
 构建会检查同名输出目录中的外来文件，不删除用户文件。跨 Python/zlib 运行时的 gzip 字节可能不同，文件内容以清单哈希核对。
 更新 Skill 快照时保留 source_skill_version 和来源哈希，避免遗漏资源文件。
