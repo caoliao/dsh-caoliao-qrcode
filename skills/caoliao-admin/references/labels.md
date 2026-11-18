@@ -34,7 +34,7 @@ node scripts/download_qrcodes.cjs --manifest images.json --output print-codes --
 | `label_exports_create` | request.qrcode_ids、format、idempotency_key | 按明确目标创建标签下载任务；格式为 png_zip、a4_pdf 或 a4_pdf_single，以配置返回的支持范围为准 |
 | `label_exports_get` | request.task_id | 查询导出结果，取得文件链接或失败原因 |
 
-MCP 参数使用 `{"request": {...}}`，成功数据在 `data` 中。配置与预览需要 templates.read（或 templates.write）；导出创建和查询需要 qrcodes.write。API key 沿用组织凭证规则，资源权限仍由服务端检查。标签按当前码读取权限及实际绑定字段判断，不因高级成员身份统一拒绝。只读成员可预览或导出不含受限字段的标签；原生标签会输出字段原文，绑定了当前不可看原文的字段时返回 LABEL_FIELD_PERMISSION_DENIED。导出回执会复查提交时字段映射和当前权限；拒绝后不能换组织凭证绕过。
+MCP 参数使用 `{"request": {...}}`，成功数据在 `data` 中。配置与预览需要 templates.read（或 templates.write）；导出创建和查询需要 qrcodes.write。个人 API Key 与 OAuth 按同样的档位判断；历史组织 API Key 不能使用标签工具（返回 credential_type_not_allowed）。资源权限仍由服务端检查。标签按当前码读取权限及实际绑定字段判断，不因高级成员身份统一拒绝。只读成员可预览或导出不含受限字段的标签；原生标签会输出字段原文，绑定了当前不可看原文的字段时返回 LABEL_FIELD_PERMISSION_DENIED。导出回执会复查提交时字段映射和当前权限；拒绝后不能换组织凭证绕过。
 
 三种格式均沿用原生 ZIP 打包下载：png_zip 包内是标签图片；a4_pdf 是多标签 A4 排版；a4_pdf_single 是 A4 每页一个标签，多个码按页输出。不要把 ZIP 链接误当成直接 PDF，也不要把“单张”理解为只允许导出一个码。
 

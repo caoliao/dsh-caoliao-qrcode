@@ -26,8 +26,18 @@
 
 | `code` | 含义 | 怎么办 |
 |---|---|---|
-| `AI_EDIT_NOT_AI_CREATED` | 这份内容没有 AI 标记 | 不能修改。告诉用户到草料后台修改，或新建一份；不要换工具绕过 |
+| `AI_EDIT_NOT_AI_CREATED` | 这份内容不是通过接口创建的 | 不能修改。告诉用户到草料后台修改，或请超级管理员在后台「API Key 管理 → 组织策略」把最高权限选为“完全”并用“完全”档重新授权；不要换工具绕过 |
 | `AI_ORIGIN_MARK_FAILED`（errors） | 内容已建好，但 AI 标记没写上 | 用原幂等键和原参数重试一次补打标记，不要换键重建；仍失败就告诉用户这份内容暂时不能通过 AI 修改 |
+| `AI_EDIT_SCOPE_REQUIRED` | 组织的上限是“完全”，但这次授权或个人 API Key 不是“完全”档 | 告诉用户重新授权并选择“完全”，或新建“完全”档的个人 API Key，不要换工具绕过 |
+| `AI_DELETE_DISABLED` | 组织的最高权限不到“完全” | 不能删除。告诉用户请超级管理员在后台「API Key 管理 → 组织策略」把最高权限选为“完全”，或到草料后台手动删除 |
+| `ACCESS_LEVEL_READ_ONLY` | 组织的最高权限是“只读” | 不能新建、修改或删除。告诉用户请超级管理员在后台「API Key 管理 → 组织策略」放宽最高权限，不要重试 |
+| `DELETE_CONFIRMATION_REQUIRED` | 确认令牌缺失、过期或不匹配 | 重新调用预览工具，把结果告诉用户并取得同意后再删除 |
+| `FORM_IN_USE` | 表单还关联着码 | 不能删除。告诉用户先解除关联 |
+| `FORM_NOT_DELETABLE` / `FORM_NOT_EDITABLE` | 这是系统表单，AI 不能删除或修改 | 告诉用户到草料后台处理，不要重试 |
+| `ORG_TEMPLATE_MANAGED` | 内容属于统一管理的组织模板 | 不能修改或删除。告诉用户联系模板管理员 |
+| `QRCODE_KIND_MISMATCH` | 目标类型不支持这个操作，如母模板、单码模板 | 换对应工具；母模板和静态码不能由 AI 删除 |
+| `insufficient_scope`（HTTP 403） | 这次授权或个人 API Key 的档位不够，如删除需要“完全”档 | 告诉用户重新授权并选择更高的档位，或新建更高档位的个人 API Key |
+| `credential_type_not_allowed`（HTTP 403） | 连接用的是历史组织 API Key，它只能使用存量的读取工具 | 告诉用户改用 OAuth 授权或个人 API Key，不要重试 |
 | `AI_EDIT_ORIGIN_UNAVAILABLE` | 暂时查不到 AI 标记 | 稍后重试一次，不要当作可以修改 |
 | `QRCODE_VERSION_CONFLICT` / `FORM_VERSION_CONFLICT` | 读取后内容变了 | 重新读编辑状态，核对后再决定，不能覆盖 |
 | `QRCODE_KIND_MISMATCH` | 码类型和工具不匹配 | 按编辑状态的 kind 选工具；母模板用 templates_edit |

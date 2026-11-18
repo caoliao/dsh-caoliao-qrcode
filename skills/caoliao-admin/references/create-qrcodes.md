@@ -9,12 +9,13 @@
 | `qrcodes_list_create_targets` | `kind=projects/categories,project_id?,page?,page_size?` | 可创建目标；分页检查has_more，不创建目录或授予写权限 |
 | `gallery_categories` | `request={}` | 模板库现有系统场景/行业分类树，真实 category_id、name、type、children |
 | `gallery_list` | `keyword?,category_id?,page=1,page_size=20`（≤50） | 至少提供关键词或分类；搜索公开码模板，可按分类限定可见子分类；list、pagination |
-| `gallery_get` | `gallery_template_id` | 用途、creation_schema可填字段、components保留组件、compatibility限制；只查询 |
-| `gallery_prepare_creation` | `gallery_template_id,project_id?,category_id?,items` | 校验数据、目标和临时文件；valid=true才有30分钟有效的plan_id，不创建码 |
+| `gallery_get` | `gallery_template_id` | 用途、creation_schema可填字段、components保留组件、compatibility限制；只查询。用户给出官网模板 ID 时可直接读取；`can_create` 表示可批量建码，`can_create_single` 表示可生成单个码 |
+| `gallery_prepare_creation` | `gallery_template_id,project_id?,category_id?,items,extra_fields?` | 校验数据、目标和临时文件；valid=true才有30分钟有效的plan_id，不创建码。模板自带字段不够时用 `extra_fields` 追加逐码填写字段，items 可同时填这些字段 |
 | `gallery_create_from_plan` | `plan_id,idempotency_key` | 后台安装原模板并批量建子码；返回任务，继续核验逐项结果 |
+| `gallery_create_qrcode` | `gallery_template_id,idempotency_key,project_id?,category_id?,name?` | 用官方模板生成单个码（等同官网「使用模板生码」），内容、表单和状态按模板原样安装；仅 `can_create_single=true` 可用，返回 qrcode_id、web_url、form_ids |
 | `templates_list_editable` | `project_id=0,page=1,page_size=20,only_creatable=false`（≤100） | 默认仅母码 `template_id`、名称、分区/目录、coding、web_url；选定后查详情，不在列表读取版本和字段 |
 | `templates_get_schema` | `template_id` | `groups`、稳定 `field_id`、类型/必填/公共可变、限制、版本和能力；建码前必读 |
-| `templates_create` | `idempotency_key,name,groups,project_id?,category_id?,name_rule?,forms?` | 新模板 schema 和 `field_mapping`；创建 field_id 是客户端 key，后续换成返回 ID；forms 绑定填写表单，须检查部分成功状态 |
+| `templates_create` | `idempotency_key,name,groups,project_id?,category_id?,name_rule?,forms?,components?` | 新模板 schema 和 `field_mapping`；创建 field_id 是客户端 key，后续换成返回 ID；forms 绑定填写表单，须检查部分成功状态 |
 | `qrcodes_create` | `idempotency_key,name,project_id?,category_id?,groups?,forms?,components?` | 新普通码 ID、链接、实际内容和绑定结果；groups字段使用public_value；components按序创建图文展示内容，先确认连接schema已支持 |
 | `qrcodes_create_url_jump` | `idempotency_key,name,url,project_id?,category_id?` | 网址跳转活码：扫码直接打开url，后台可改地址并有统计；返回qrcode_id、web_url；URL_BLOCKED为平台禁用域名 |
 | `qrcodes_create_multi_url` | `idempotency_key,name,links:[{title,url}],project_id?,category_id?` | 网址聚合码：扫码打开1-100个链接的清单页，按顺序展示；返回qrcode_id、web_url和读回links |
@@ -26,12 +27,16 @@
 | `templates_preview_edit` | `template_id,template_version,patch` | 预览、`affected_count,preview_token,expires_at`；不保存，需 templates.write |
 | `templates_edit` | 同预览，加 `idempotency_key,preview_token?` | 新版本和字段映射；影响已有子码先预览并核实授权，groups 为完整快照，不能删字段或改类型 |
 | `qrcodes_get_edit_state` | `qrcode_id` | 修改前必读：`kind,version,editable,reason`，普通码带 `components[].ref`，子码带 `fields`，网址码带 `links`；只读，需 qrcodes.write |
-| `qrcodes_edit` | `qrcode_id,version,idempotency_key,name?,groups?,components?` | 改 AI 创建的普通码；`{type:"keep",ref}` 保留已有组件，返回新 `version` |
-| `qrcodes_edit_url_jump` | `qrcode_id,version,idempotency_key,name?,url?` | 改 AI 创建的跳转码；码图和 web_url 不变 |
-| `qrcodes_edit_multi_url` | `qrcode_id,version,idempotency_key,name?,links?` | 改 AI 创建的聚合码；links 整体替换 |
-| `qrcode_children_edit` | `qrcode_id,version,idempotency_key,name?,values?` | 改 AI 批量创建的单个子码；values 只传要改的字段 |
+| `qrcodes_edit` | `qrcode_id,version,idempotency_key,name?,groups?,components?` | 改普通码（默认只限 AI 创建的）；`{type:"keep",ref}` 保留已有组件，返回新 `version` |
+| `qrcodes_edit_url_jump` | `qrcode_id,version,idempotency_key,name?,url?` | 改跳转码（默认只限 AI 创建的）；码图和 web_url 不变 |
+| `qrcodes_edit_multi_url` | `qrcode_id,version,idempotency_key,name?,links?` | 改聚合码（默认只限 AI 创建的）；links 整体替换 |
+| `qrcode_children_edit` | `qrcode_id,version,idempotency_key,name?,values?` | 改单个子码（默认只限 AI 批量创建的）；values 只传要改的字段 |
 | `forms_get_edit_state` | `form_id` | 修改前必读：字段（持久 field_id）、`version,editable,reason`；只读，需 templates.write |
-| `forms_edit` | `form_id,version,idempotency_key,name?,fields?` | 改 AI 创建的表单；fields 是完整快照，不能删字段、删选项或改类型 |
+| `forms_edit` | `form_id,version,idempotency_key,name?,fields?` | 改表单（默认只限 AI 创建的）；fields 是完整快照，不能删字段、删选项或改类型 |
+| `qrcodes_preview_delete` | `qrcode_ids`（最多 20 个） | 删除前必读：逐个复核权限，返回 `items,confirm_token`；不修改数据，需 qrcodes.write + content.delete |
+| `qrcodes_delete` | `qrcode_ids,confirm_token,idempotency_key` | 把 items 告诉用户并取得同意后才能调用；不支持母模板和静态码 |
+| `forms_preview_delete` | `form_ids`（最多 5 个） | 删除前必读：表单不能关联任何码；返回 `items,confirm_token`，需 templates.write + content.delete |
+| `forms_delete` | `form_ids,confirm_token,idempotency_key` | 把 items 告诉用户并取得同意后才能调用 |
 
 ## 选目标与创建方式
 
@@ -122,7 +127,7 @@ unknown/unavailable 或提交超时按 [错误处理](errors.md) 对账。现有
 
 ## 用户要求修改已创建的内容时
 
-AI 通过 MCP 生成的内容带 AI 标记，只能修改有标记的内容；用户在草料后台建的不能改。人在后台改过不影响标记，仍可修改，所以提交前必须以这次读到的内容为准，不要用旧内容覆盖。这条规则由服务端判断，不要用别的工具绕过。
+通过接口（MCP 或 API）创建的内容带标记，默认只能修改有标记的内容。组织超级管理员在后台「API Key 管理 → 组织策略」把最高权限选为“完全”，并且这次授权或所用的个人 API Key 是“完全”档（带 content.edit_all）后，也能修改人工创建的内容；组织 API Key 连接不能修改人工创建的内容。放开后的修改可能覆盖成员的内容，修改人工创建的内容前要向用户确认。统一管理的组织模板复制件和系统表单始终不能由 AI 修改。人在后台改过不影响标记，仍可修改，所以提交前必须以这次读到的内容为准，不要用旧内容覆盖。这条规则由服务端判断，不要用别的工具绕过。
 
 | 对象 | 先读 | 再改 |
 |---|---|---|
@@ -133,12 +138,34 @@ AI 通过 MCP 生成的内容带 AI 标记，只能修改有标记的内容；�
 | 表单 | forms_get_edit_state | forms_edit |
 | 母模板 | templates_get_schema | templates_preview_edit → templates_edit |
 
-步骤：读状态 → editable=false 就按 reason 告知用户并停止 → 用返回的 version 提交 → 核对 status 和读回内容，下次修改用新 version。省略的字段保持原值，不能传 null。静态码内容不可改，需要重新创建。
+步骤：读状态 → editable=false 就按 reason 告知用户并停止（AI_EDIT_NOT_AI_CREATED 表示组织上限不到“完全”，AI_EDIT_SCOPE_REQUIRED 表示要用“完全”档重新授权）→ 用返回的 version 提交 → 核对 status 和读回内容，下次修改用新 version。省略的字段保持原值，不能传 null。静态码内容不可改，需要重新创建。
 
 - **普通码**：components 是完整有序清单，已有组件用 `{"type":"keep","ref":"c_123"}` 保留，新内容按 qrcodes_create 的格式写，没列出的会被删除；groups 是基础信息完整快照，其中已有图片和附件要重新上传。操作面板等其他组件不受影响，也不能在这里改绑定表单。
 - **子码**：values 只传要改的字段，其余保持原值；不能改公共字段和模板结构。
 - **表单**：可改名称、必填、顺序，可追加字段和选项；不能删字段、删选项或改类型，也不能改计分和周期。要大改就新建一份，不要反复尝试。
 - 修改码内容不改变 web_url，已印刷的码继续有效。改完如实说明改了什么。
+
+## 用户要求删除内容时
+
+默认不能删除。要同时满足三个条件才能删除：
+
+1. 组织超级管理员在后台「API Key 管理 → 组织策略」把最高权限选为“完全”。
+2. 这次授权或所用的个人 API Key 是“完全”档（带 content.delete）。组织 API Key 连接不能删除。
+3. 当前用户有该内容的分区管理权限，内容没有被锁定。
+
+| 对象 | 先预览 | 再删除 | 限制 |
+|---|---|---|---|
+| 普通码、跳转码、聚合码、子码 | qrcodes_preview_delete | qrcodes_delete | 一次最多 20 个，不支持母模板和静态码 |
+| 表单 | forms_preview_delete | forms_delete | 一次最多 5 个，只能删没有关联码的表单 |
+
+步骤：
+
+1. 只在用户明确要求删除时操作，不因清理、去重或修复错误自行删除。
+2. 调用预览工具。把 items 里的名称、类型、是否 AI 创建告诉用户，取得明确同意。预览不修改数据。
+3. 用预览返回的 confirm_token 和新的 idempotency_key 调用删除工具，目标必须和预览完全相同。令牌 10 分钟内有效，过期或用户改了目标就重新预览。
+4. 检查 status。succeeded 表示全部删除；partial_success 时分别告诉用户 deleted 和 errors，不要换幂等键盲目重试。结果未知时用原幂等键和原参数重试。
+
+删除后，用户可以在草料后台的“设置 → 操作日志”里恢复，码和子码也可以用“删码恢复工具”恢复；AI 没有恢复工具，告诉用户去后台操作。母模板、静态码和已关联码的表单，告诉用户到草料后台处理。不要改用修改工具清空内容来代替删除。
 
 ## 用户明确要求编辑已有模板时
 

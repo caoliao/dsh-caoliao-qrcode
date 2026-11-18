@@ -70,7 +70,7 @@
 
 收到参数校验失败时，按错误路径与工具 schema 修正结构；不要试探不同包裹层、添加 org_id 或换用另一套业务接口。创建工具的完整示例见 [员工通讯录](../examples/employee-directory.md) 和 [设备巡检](../examples/equipment-inspection.md)。
 
-## 修改 AI 创建的内容
+## 修改已有内容
 
 先读状态，用返回的 version 提交；省略的字段保持原值。
 
@@ -91,6 +91,24 @@ forms_edit，已有字段用 forms_get_edit_state 返回的 field_id，新字段
 ```json
 {"request":{"form_id":"ACTUAL_FORM_ID","version":"ACTUAL_VERSION","idempotency_key":"RUN-edit-003","fields":[{"field_id":"ACTUAL_FIELD_ID","name":"备注","type":"text","required":true},{"field_id":"new_note","name":"补充说明","type":"textarea"}]}}
 ```
+
+## 删除内容
+
+只在用户明确要求时使用。先预览，把结果告诉用户并取得同意后再删除。
+
+qrcodes_preview_delete：
+
+```json
+{"request":{"qrcode_ids":["ACTUAL_ID_1","ACTUAL_ID_2"]}}
+```
+
+qrcodes_delete，qrcode_ids 必须和预览时相同：
+
+```json
+{"request":{"qrcode_ids":["ACTUAL_ID_1","ACTUAL_ID_2"],"confirm_token":"ACTUAL_CONFIRM_TOKEN","idempotency_key":"RUN-delete-001"}}
+```
+
+forms_preview_delete 和 forms_delete 的参数相同，把 qrcode_ids 换成 form_ids。
 
 ## 已有模板批量方案提交
 

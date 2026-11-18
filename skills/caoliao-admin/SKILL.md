@@ -10,9 +10,9 @@ metadata:
     query Caoliao data and scan metrics; create product pages with text, images and
     links, templates and forms, upload assets, inspect recurring plans and unfinished
     checks, and discover the current organization and capabilities.
-  version: 2026.11.1
+  version: 2026.1118.0
   author: 草料二维码
-  source_skill_version: 1.16.4
+  source_skill_version: 2026.1118.0
 ---
 
 # 草料 MCP
@@ -54,6 +54,7 @@ metadata:
 | 不确定 request 包裹或模板查询入口 | [完整入参示例](references/tool-arguments.md) |
 | 新建检查表、配置周期、查计划、列出某周期完成/未完成的具体码 | [表单与周期](references/forms-and-cycles.md) |
 | 新建培训测验、单选/判断计分表单，查询每次作答成绩与正确答案 | [答题计分](references/quiz.md) |
+| 修改或删除已有的码、子码、表单 | [修改](references/create-qrcodes.md#用户要求修改已创建的内容时)、[删除](references/create-qrcodes.md#用户要求删除内容时) |
 | 给已建好的码预览标签、下载图片包或 A4 PDF | [标签预览与下载](references/labels.md) |
 | 权限不足、部分成功、超时、结果不完整 | [错误与恢复](references/errors.md) |
 
@@ -82,9 +83,9 @@ metadata:
 
 - MCP/API 额度按当前组织主账号的套餐计算，同组织的 OAuth、API key 和 MCP 共用额度。需要查看额度或遇到限额时调用 usage_get，以返回的套餐、limit、used、reserved、remaining 和 reset_at 为准；不按客户端名称猜套餐，也不把套餐查询失败时的免费档兜底当作用户实际套餐。
 
-- 组织由 OAuth 连接决定，不靠请求中的 org_id 切换；使用客户端正常授权入口，不索要网页登录 Cookie 或要求用户导出 OAuth token。权限不足按返回说明处理，不通过其他凭证绕过。
+- 组织由连接使用的凭证决定（OAuth 授权时选择的组织，或个人 API Key 创建时所在的组织），不靠请求中的 org_id 切换；使用客户端正常授权入口，不索要网页登录 Cookie 或要求用户导出 OAuth token。权限不足按返回说明处理，不通过其他凭证绕过。
 - 客户端使用设备码授权时，引导用户打开客户端提供的验证页面、输入 user_code，并核对应用、组织和权限后自行同意或拒绝；是否采用设备码由客户端决定，不手工拼授权请求或索取 device_code/token。
-- 按用户已授权的任务执行。新建场景只创建新资源；修改是单独操作，仅在用户明确要求时使用，只能改带 AI 标记（AI 通过 MCP 生成）的内容，流程见 create-qrcodes，不为完成新建任务改动已有内容。
+- 按用户已授权的任务执行。新建场景只创建新资源；修改是单独操作，仅在用户明确要求时使用，默认只能改带 AI 标记（AI 通过 MCP 生成）的内容；删除同样仅在用户明确要求时使用，必须先预览并取得用户同意，流程见 create-qrcodes，不为完成新建任务改动已有内容。
 - 名称用于沟通，ID 用于调用。同名对象先确认；所有资源 ID 来自查询或创建响应。普通码 qrcode_id、短码 coding、模板母码 template_id、填写表单 form_id 不能混用。
 - MCP 新建码、上传及周期工具使用 `{"request": {...}}`，成功响应为 `{"data": {...}}`；旧浏览工具可能返回 `{code:0,data:...}`，语义分析工具返回 `{data,notes?,next_actions?}`。以实际 schema 和响应为准，不把整个响应当下一步参数。
 - 创建返回 ID、HTTP 成功或任务 succeeded 都不等于所有业务步骤完成。检查 status、errors、逐项结果和截断信息；未知结果保留原 ID、原请求和幂等键，按错误说明恢复。
@@ -93,16 +94,32 @@ metadata:
 
 ## 权限速查
 
+凭证分三档：只读、读写、完全。OAuth 在授权页选择，个人 API Key 在创建时选择，两者规则相同；实际生效的是凭证档位和组织最高权限（后台「API Key 管理 → 组织策略」，由超级管理员设置）中较低的一个。档位不够时告诉用户重新授权或新建更高档位的个人 API Key，不换凭证绕过。
+
+| 档位 | 包含的 scope |
+|---|---|
+| 只读 | qrcodes.read、templates.read、records.read、metrics.read |
+| 读写 | 只读的全部，加 qrcodes.write、templates.write、records.write、assets.write |
+| 完全 | 读写的全部，加 content.edit_all、content.delete |
+
 | 操作 | 所需 scope |
 |---|---|
+| 码、子码、分区、工作台和视图的浏览与读取 | qrcodes.read |
+| 指标目录、指标定义和统计查询 | metrics.read |
 | 模板库分类/列表/详情、建码目标、可用模板及模板 schema 查询 | templates.read（也接受 templates.write） |
 | 新建表单、新建模板、明确授权的模板和表单修改 | templates.write |
 | 官方模板准备建码及执行方案 | templates.write + qrcodes.write（两项都需满足） |
 | 普通码、静态码、跳转/聚合码、批量预校验与提交、任务及逐项结果、修改 AI 创建的码和子码 | qrcodes.write |
+| 修改人工创建的内容 | 对应写 scope + content.edit_all（授权时选“完全”档才有），且组织的最高权限是“完全” |
+| 删除码、子码、表单 | qrcodes.write 或 templates.write + content.delete（授权时选“完全”档才有），且组织的最高权限是“完全” |
 | 上传申请与状态 | assets.write |
-| 表单列表、表单详情、记录列表与详情；周期查询 | records.read |
+| 表单列表、表单详情；标签配置与预览 | templates.read |
+| 记录列表、详情与后续动态；周期查询 | records.read |
+| 标签导出任务的创建与查询 | qrcodes.write |
 | 当前组织与能力发现 | 只需有效凭证，不要求业务 scope |
 
-高级成员可以通过 OAuth 授权；表单与记录查询同时受授权 scope 和当前成员的资源/分区权限限制，不代表可访问整个组织。查询流程与不完整结果的处理见[查询与分析](references/query-and-analysis.md#高级成员的表单与记录查询)。
+历史组织 API Key 只能使用存量的读取工具，不能新建、修改、删除或导出标签，调用时返回 credential_type_not_allowed；遇到时告诉用户改用 OAuth 授权或个人 API Key。
+
+高级成员可以通过 OAuth 授权，组织允许时也可以创建个人 API Key；表单与记录查询同时受授权 scope 和当前成员的资源/分区权限限制，不代表可访问整个组织。查询流程与不完整结果的处理见[查询与分析](references/query-and-analysis.md#高级成员的表单与记录查询)。
 
 工具标记为只读不表示无需相应 scope。组织及项目的实际可用范围由服务端检查，查询到对象不代表已获得写权限。

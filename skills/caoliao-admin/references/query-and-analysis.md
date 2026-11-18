@@ -27,13 +27,13 @@ project_id 是分区，workspace_id 是工作台，view_id 是工作台视图，
 
 ## 当前组织与可用能力
 
-确认连接身份或排查可用能力时，调用 auth_get_context，参数为 request={}；只查某项时用 request={"operations":["gallery_list"]}（最多20项）。未知工具返回 unknown_operation，不能当作有权限。无需每次查数前重复调用。organization 是当前凭证绑定组织；API key 的 user_id 为 null，不把它当自然人账号。
+确认连接身份或排查可用能力时，调用 auth_get_context，参数为 request={}；只查某项时用 request={"operations":["gallery_list"]}（最多20项）。未知工具返回 unknown_operation，不能当作有权限。无需每次查数前重复调用。organization 是当前凭证绑定组织；OAuth 和个人 API Key 都按成员身份处理并带 user_id，历史组织 API Key 的 user_id 为 null，不把它当自然人账号。access_level 是组织当前的最高权限。
 
-effective_scopes 反映现行授权规则；capabilities[].available 只检查当前凭证及已知配置，不保证资源/项目权限、套餐容量、数据库连接或服务健康。required_scope=null 的存量工具沿用原有校验，不代表匿名可用。权限不足按正常授权处理；完整工具参数始终以 tools/list 为准，不凭 scope 名猜测未实现的操作。
+effective_scopes 反映现行授权规则；capabilities[].available 只检查当前凭证及已知配置，不保证资源/项目权限、套餐容量、数据库连接或服务健康。required_scope=null 只出现在当前身份和额度这两个发现类操作上，不代表匿名可用，也不代表其他操作不需要 scope。权限不足按正常授权处理；完整工具参数始终以 tools/list 为准，不凭 scope 名猜测未实现的操作。
 
 ## 高级成员的表单与记录查询
 
-高级成员 OAuth 按当前 user+org、授权 scope 和资源/分区权限校验；连接成功或持有 records.read 不等于可以读取整个组织。撤销分区权限后，后续查询按新权限执行。
+高级成员的 OAuth 授权和个人 API Key 都按当前 user+org、授权 scope 和资源/分区权限校验；连接成功或持有 records.read 不等于可以读取整个组织。撤销分区权限后，后续查询按新权限执行。
 
 1. 找表单用 `forms_list`：按当前可读表单分区过滤后搜索、分页和计数；`search_key` 匹配名称/备注/编号，`number` 精确匹配编号。列表及总数只代表当前可见范围，不能称为组织全部表单。
 2. 读字段用 `form_get`：单个无权对象返回错误；批量请求逐项校验，检查每项 `error`，不能把整批成功当成每个表单都可读。
