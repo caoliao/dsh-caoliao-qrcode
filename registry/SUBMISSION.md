@@ -1,6 +1,6 @@
 # 草料二维码 · Registry 上架材料
 
-材料版本：**2026.1118.0**。
+材料版本：**2026.1118.1**。
 
 ## 文件与用途
 
@@ -10,7 +10,7 @@
 | registry/assets/caoliao-qrcode.png | 待提交到上游 assets/ 的原始品牌图标 |
 | PR-BODY.md | PR 正文草稿 |
 | build-manifest.json | 构建版本与文件哈希，不提交 Registry |
-| dsh-caoliao-qrcode-2026.1118.0.tgz | 配套插件本地安装包，不提交 Registry |
+| dsh-caoliao-qrcode-2026.1118.1.tgz | 配套插件本地安装包，不提交 Registry |
 
 ## 图标
 
