@@ -22,7 +22,9 @@ files["skill-manifest.json"] = (ROOT / "skill-manifest.json").read_bytes()
 assert json.loads(files["skill-manifest.json"])["version"] == pkg["version"]
 for path in sorted((ROOT / "skills").rglob("*")):
     if path.is_file(): files[path.relative_to(ROOT).as_posix()] = path.read_bytes()
-target = OUT / pkg["name"]
+# Output names drop the npm scope: @caoliao/dsh-caoliao-qrcode -> dsh-caoliao-qrcode.
+slug = pkg["name"].rsplit("/", 1)[-1]
+target = OUT / slug
 if target.exists():
     extra = {p.relative_to(target).as_posix() for p in target.rglob("*") if p.is_file()} - set(files)
     if extra: raise ValueError("Foreign files in output: " + str(sorted(extra)))
@@ -37,7 +39,7 @@ with gzip.GzipFile(fileobj=buffer, mode="wb", mtime=0, filename="", compressleve
             info = tarfile.TarInfo("package/" + name)
             info.size, info.mode, info.mtime = len(content), 0o644, 0
             tar.addfile(info, io.BytesIO(content))
-archive = OUT / f"{pkg['name']}-{pkg['version']}.tgz"
+archive = OUT / f"{slug}-{pkg['version']}.tgz"
 archive.write_bytes(buffer.getvalue())
 registry = OUT / "registry"
 (registry / "connectors").mkdir(parents=True, exist_ok=True)

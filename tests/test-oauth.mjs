@@ -17,9 +17,9 @@ const { CaoliaoOAuth, GRANT_KEY, TOKEN_REF, SERVER, ISSUER, rpcHandler, register
 
 test('installable package declares its bundle and includes compiled client and Skill', async () => {
   const pkg = JSON.parse(await readFile(join(bundle, 'package.json'), 'utf8'))
-  assert.equal(pkg.name, 'dsh-caoliao-qrcode')
+  assert.equal(pkg.name, '@caoliao/dsh-caoliao-qrcode')
   assert.equal(pkg.dsh.bundle.patch, './cordis.patch.yml')
-  assert.match(await readFile(join(bundle, pkg.dsh.bundle.patch), 'utf8'), /name: dsh-caoliao-qrcode/)
+  assert.match(await readFile(join(bundle, pkg.dsh.bundle.patch), 'utf8'), /name: '@caoliao\/dsh-caoliao-qrcode'/)
   for (const entry of [pkg.main, pkg.exports['./client'], pkg.icon, 'skills/caoliao-admin/SKILL.md']) {
     assert.ok((await readFile(join(bundle, entry))).length)
   }
