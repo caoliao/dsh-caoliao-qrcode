@@ -1,4 +1,4 @@
-下载 `dsh-caoliao-qrcode.tgz`，在 DeepSeek Harness 的「插件 → 添加插件」中选择该文件，安装并启用后重启。
+推荐在 DeepSeek Harness 的「插件 → 添加插件」中输入包名 `@caoliao/dsh-caoliao-qrcode` 安装，之后可在插件页直接更新。也可以下载 `dsh-caoliao-qrcode.tgz`，在「添加插件」中选择该文件安装，安装并启用后重启。
 
 打开「草料二维码」，点击「连接草料账号」完成授权，即可开始使用。
 
