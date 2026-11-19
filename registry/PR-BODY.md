@@ -37,7 +37,7 @@ Add Caoliao QRCode OAuth connector and brand icon
 - [x] OAuth 描述不包含 Token、Cookie、Client Secret 或带值的 Authorization。
 - [x] 卡片分类为办公协作，featured 为 false，probeStatus 保留 unverified。
 - [x] 示例不包含真实客户、个人信息或凭据，写入示例先准备方案。
-- [x] 卡片、插件文案与 Logo 已同步为 2026.1118.1 交付材料。
+- [x] 卡片、插件文案与 Logo 已同步为 2026.1119.0 交付材料。
 - [ ] 合并前检查拟托管 Logo 的 HTTPS 响应、图片类型和跨域可读性。
 - [ ] 在第三方连接器中完成真实 OAuth 登录、刷新与只读工具调用，提供脱敏报告链接。
 - [ ] 补充服务条款链接、提交主体和公开维护联系人。
