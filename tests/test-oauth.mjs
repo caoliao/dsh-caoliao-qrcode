@@ -273,6 +273,14 @@ test('HTTP route preserves admission, owner checks and native RPC envelopes', as
   } finally { await f.oauth.dispose() }
 })
 
+test('client bundle registers under the package name so Harness loads it', async () => {
+  // Harness matches a client bundle to its package by the id passed to __ModuleLoader__.load.
+  const pkg = JSON.parse(await readFile(join(bundle, 'package.json'), 'utf8'))
+  let id
+  runInNewContext(await readFile(join(bundle, 'client.js'), 'utf8'), { window: { __ModuleLoader__: { load: module => { id = module.id } } } })
+  assert.equal(id, pkg.name)
+})
+
 test('client entry registers native sidebar and renders with React', async () => {
   let client
   runInNewContext(await readFile(join(bundle, 'client.js'), 'utf8'), { window: { __ModuleLoader__: { load: module => { client = module.factory(require) } } } })

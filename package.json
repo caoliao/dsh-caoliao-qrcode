@@ -1,6 +1,6 @@
 {
   "name": "@caoliao/dsh-caoliao-qrcode",
-  "version": "2026.1119.0",
+  "version": "2026.1119.1",
   "private": true,
   "description": "用对话轻松建码、管理表单、分析巡检记录，让日常工作更简单。",
   "icon": "./logo.png",

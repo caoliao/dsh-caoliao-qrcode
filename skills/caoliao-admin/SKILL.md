@@ -10,7 +10,7 @@ metadata:
     query Caoliao data and scan metrics; create product pages with text, images and
     links, templates and forms, upload assets, inspect recurring plans and unfinished
     checks, and discover the current organization and capabilities.
-  version: 2026.1119.0
+  version: 2026.1119.1
   author: 草料二维码
   source_skill_version: 2026.1118.1
 ---
